@@ -37,6 +37,15 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
+    }
+
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
@@ -56,7 +65,7 @@ dependencies {
 
     // Glide
     implementation(libs.glide)
-    kapt(libs.compiler)
+    annotationProcessor(libs.compiler)
 
     // Navigation Component
     implementation(libs.androidx.navigation.fragment.ktx)
@@ -71,4 +80,6 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.retrofit.converters)
     implementation (libs.logging.interceptor)
+
+    implementation (libs.library)
 }
