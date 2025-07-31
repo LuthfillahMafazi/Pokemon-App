@@ -57,7 +57,7 @@ class HomeFragment : Fragment() {
 
     private fun observeListPokemon() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.pokemonResponse.collect {
                     adapter.submitList(it?.results?.toMutableList())
                 }

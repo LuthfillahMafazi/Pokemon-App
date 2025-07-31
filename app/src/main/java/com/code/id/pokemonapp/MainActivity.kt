@@ -7,14 +7,12 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.code.id.pokemonapp.databinding.ActivityMainBinding
-import com.code.id.pokemonapp.presentation.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -63,7 +61,7 @@ class MainActivity : AppCompatActivity() {
 
         binding?.bottomNavigation?.setOnItemSelectedListener { item ->
             val selectedGraphId = when (item.itemId) {
-                R.id.nav_biznis -> R.navigation.nav_home
+                R.id.nav_home -> R.navigation.nav_home
                 R.id.nav_profile -> R.navigation.nav_profile
                 else -> return@setOnItemSelectedListener false
             }
@@ -90,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val defaultGraphId = navGraphIds.first()
-        binding?.bottomNavigation?.selectedItemId = R.id.nav_biznis
+        binding?.bottomNavigation?.selectedItemId = R.id.nav_home
         supportFragmentManager.beginTransaction().show(navGraphIdMap[defaultGraphId]!!).commit()
         currentNavController = navGraphIdMap[defaultGraphId]?.navController
 

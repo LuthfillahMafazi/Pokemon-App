@@ -18,9 +18,15 @@ class PokemonRepositoryImpl @Inject constructor(
         offset: String,
         limit: String
     ): Flow<Resource<PokemonResponse>> = flow {
-        val response = remoteService.getPokemonList(offset, limit)
-        if (response.isSuccessful) {
-            emit(Resource.Success(response.body()))
+        try {
+            val response = remoteService.getPokemonList(offset, limit)
+            if (response.isSuccessful) {
+                localService.insertAll(response.body()?.results)
+                emit(Resource.Success(response.body()))
+            }
+        } catch (e: Exception) {
+            var dataLocal = PokemonResponse(results = localService.getAllPokemon())
+            emit(Resource.Success(dataLocal))
         }
     }.flowOn(Dispatchers.IO)
 }
