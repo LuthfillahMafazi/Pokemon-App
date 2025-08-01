@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val useCase: IHomeUseCase
-): ViewModel() {
+) : ViewModel() {
 
     private val _pokemonResponse = MutableStateFlow<PokemonResponse?>(null)
     val pokemonResponse get() = _pokemonResponse.asStateFlow()
@@ -41,19 +41,17 @@ class HomeViewModel @Inject constructor(
 
     fun searchPokemon(searchText: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            _pokemonResponse.collect {
-                val dataList = _pokemonResponse.value?.results.orEmpty()
+            val dataList = _pokemonResponse.value?.results.orEmpty()
 
-                val searchList = if (searchText.isNotBlank()) {
-                    dataList.filter {
-                        it.name?.contains(searchText.trim(), ignoreCase = true) == true
-                    }
-                } else {
-                    dataList
+            val searchList = if (searchText.isNotBlank()) {
+                dataList.filter {
+                    it.name?.contains(searchText.trim(), ignoreCase = true) == true
                 }
-
-                _searchResults.emit(searchList)
+            } else {
+                dataList
             }
+
+            _searchResults.emit(searchList)
         }
     }
 }
