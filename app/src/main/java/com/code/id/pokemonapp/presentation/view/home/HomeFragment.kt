@@ -10,19 +10,25 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.code.id.pokemonapp.R
+import com.code.id.pokemonapp.data.local.PreferenceManager
 import com.code.id.pokemonapp.databinding.FragmentHomeBinding
 import com.code.id.pokemonapp.presentation.view.adapter.PokemonAdapter
 import com.code.id.pokemonapp.presentation.viewmodel.HomeViewModel
 import com.code.id.pokemonapp.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding
+
+    @Inject
+    lateinit var preferenceManager: PreferenceManager
 
     private val adapter: PokemonAdapter by lazy {
         PokemonAdapter {
@@ -49,10 +55,17 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        checkUserLogin()
         viewModel.getPokemonList("0", "20")
         setupAdapter()
         observeListPokemon()
 
+    }
+
+    private fun checkUserLogin() {
+        if (preferenceManager.isLoggedIn() == false) {
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToNavAuth())
+        }
     }
 
     private fun observeListPokemon() {

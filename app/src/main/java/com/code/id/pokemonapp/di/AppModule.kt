@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.code.id.pokemonapp.data.local.PokemonDbSqLite
+import com.code.id.pokemonapp.data.local.PreferenceManager
+import com.code.id.pokemonapp.data.local.user.UserDbSqLite
 import com.code.id.pokemonapp.utils.NetworkException
 import com.code.id.pokemonapp.utils.NetworkUtil
 import dagger.Module
@@ -73,7 +75,18 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providePreferenceManager(@ApplicationContext context: Context): PreferenceManager {
+        return PreferenceManager(context)
+    }
+
+    @Provides
+    @Singleton
     fun provideDbHelper(@ApplicationContext context: Context): PokemonDbSqLite =
         PokemonDbSqLite(context)
+
+    @Provides
+    @Singleton
+    fun provideDbUserHelper(@ApplicationContext context: Context): UserDbSqLite =
+        UserDbSqLite(context)
 
 }
