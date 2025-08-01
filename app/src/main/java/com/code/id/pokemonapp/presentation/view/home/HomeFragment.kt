@@ -1,6 +1,8 @@
 package com.code.id.pokemonapp.presentation.view.home
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -58,8 +60,41 @@ class HomeFragment : Fragment() {
         checkUserLogin()
         viewModel.getPokemonList("0", "20")
         setupAdapter()
+        initSearch()
         observeListPokemon()
+        observeSearch()
 
+    }
+
+    private fun observeSearch() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.searchResults.collect {
+                    adapter.submitList(it.toMutableList())
+                }
+            }
+        }
+    }
+
+    private fun initSearch() {
+        binding?.apply {
+            etSearch.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    p0: CharSequence?, p1: Int, p2: Int, p3: Int
+                ) {
+                }
+
+                override fun onTextChanged(
+                    p0: CharSequence?, p1: Int, p2: Int, p3: Int
+                ) {
+                    viewModel.searchPokemon(p0.toString())
+                }
+
+                override fun afterTextChanged(p0: Editable?) {
+                }
+
+            })
+        }
     }
 
     private fun checkUserLogin() {
