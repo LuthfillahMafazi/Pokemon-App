@@ -69,7 +69,7 @@ class HomeFragment : Fragment() {
 
     private fun observeSearch() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.searchResults.collect {
                     if (true) {
                         adapter.submitList(it.toMutableList())
