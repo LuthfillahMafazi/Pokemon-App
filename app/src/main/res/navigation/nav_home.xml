@@ -13,6 +13,18 @@
         <action
             android:id="@+id/action_homeFragment_to_nav_auth"
             app:destination="@id/nav_auth" />
+        <action
+            android:id="@+id/action_homeFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
     </fragment>
     <include app:graph="@navigation/nav_auth" />
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.code.id.pokemonapp.presentation.view.detail.DetailFragment"
+        android:label="fragment_detail"
+        tools:layout="@layout/fragment_detail" >
+        <argument
+            android:name="pokemonItem"
+            app:argType="com.code.id.pokemonapp.domain.model.PokemonItem" />
+    </fragment>
 </navigation>

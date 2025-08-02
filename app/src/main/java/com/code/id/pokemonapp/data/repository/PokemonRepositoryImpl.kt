@@ -2,6 +2,7 @@ package com.code.id.pokemonapp.data.repository
 
 import com.code.id.pokemonapp.data.local.PokemonDbSqLite
 import com.code.id.pokemonapp.data.remote.PokemonApiService
+import com.code.id.pokemonapp.domain.model.PokemonDetailResponse
 import com.code.id.pokemonapp.domain.model.PokemonResponse
 import com.code.id.pokemonapp.utils.Resource
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,17 @@ class PokemonRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             var dataLocal = PokemonResponse(results = localService.getAllPokemon())
             emit(Resource.Success(dataLocal))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun getPokemonDetail(url: String): Flow<Resource<PokemonDetailResponse>> = flow {
+        try {
+            val response = remoteService.getDetailPokemon(url)
+            if (response.isSuccessful) {
+                emit(Resource.Success(response.body()))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message.toString()))
         }
     }.flowOn(Dispatchers.IO)
 }

@@ -2,7 +2,9 @@ package com.code.id.pokemonapp.di
 
 import com.code.id.pokemonapp.data.repository.IPokemonRepository
 import com.code.id.pokemonapp.data.repository.IUserRepository
+import com.code.id.pokemonapp.domain.usecase.DetailUseCase
 import com.code.id.pokemonapp.domain.usecase.HomeUseCase
+import com.code.id.pokemonapp.domain.usecase.IDetailUseCase
 import com.code.id.pokemonapp.domain.usecase.IHomeUseCase
 import com.code.id.pokemonapp.domain.usecase.ILoginUseCase
 import com.code.id.pokemonapp.domain.usecase.IRegisterUseCase
@@ -24,6 +26,14 @@ object UseCaseModule {
         repository: IPokemonRepository
     ): IHomeUseCase {
         return HomeUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDetailUseCase(
+        repository: IPokemonRepository
+    ): IDetailUseCase {
+        return DetailUseCase(repository)
     }
 
     @Provides

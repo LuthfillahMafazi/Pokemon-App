@@ -35,7 +35,7 @@ class HomeFragment : Fragment() {
 
     private val adapter: PokemonAdapter by lazy {
         PokemonAdapter {
-
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToDetailFragment(it))
         }
     }
 
