@@ -3,11 +3,9 @@ package com.code.id.pokemonapp.presentation.view.home
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -15,12 +13,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.code.id.pokemonapp.R
+import androidx.recyclerview.widget.RecyclerView
 import com.code.id.pokemonapp.data.local.PreferenceManager
 import com.code.id.pokemonapp.databinding.FragmentHomeBinding
 import com.code.id.pokemonapp.presentation.view.adapter.PokemonAdapter
 import com.code.id.pokemonapp.presentation.viewmodel.HomeViewModel
-import com.code.id.pokemonapp.utils.Resource
+import com.code.id.pokemonapp.utils.NetworkUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,12 +28,19 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding
 
+    private var offset = 0
+    private var isLoading = false
+
     @Inject
     lateinit var preferenceManager: PreferenceManager
 
     private val adapter: PokemonAdapter by lazy {
         PokemonAdapter {
-            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToDetailFragment(it))
+            findNavController().navigate(
+                HomeFragmentDirections.actionHomeFragmentToDetailFragment(
+                    it
+                )
+            )
         }
     }
 
@@ -59,11 +64,11 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         checkUserLogin()
-        viewModel.getPokemonList("0", "20")
+        viewModel.getPokemonList(offset.toString(), "10")
         setupAdapter()
         initSearch()
-        observeListPokemon()
         observeSearch()
+        observeListPokemon()
 
     }
 
@@ -72,7 +77,7 @@ class HomeFragment : Fragment() {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.searchResults.collect {
                     if (true) {
-                        adapter.submitList(it.toMutableList())
+                        adapter.submitList(it?.toMutableList())
                     }
                 }
             }
@@ -108,8 +113,9 @@ class HomeFragment : Fragment() {
 
     private fun observeListPokemon() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.pokemonResponse.collect {
+                    isLoading = false
                     adapter.submitList(it?.results?.toMutableList())
                 }
             }
@@ -121,6 +127,23 @@ class HomeFragment : Fragment() {
             rvPokemon.layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             rvPokemon.adapter = adapter
+
+            rvPokemon.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if (dy <= 0 || isLoading) return
+
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 2 && NetworkUtil.isConnected(requireContext())) {
+                        isLoading = true
+                        offset += 10
+                        viewModel.getPokemonList(offset.toString(), "10")
+                    }
+                }
+            })
         }
     }
 }

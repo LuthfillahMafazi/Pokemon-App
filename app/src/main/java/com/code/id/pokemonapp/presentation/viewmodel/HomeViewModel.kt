@@ -30,7 +30,13 @@ class HomeViewModel @Inject constructor(
             useCase.getPokemonList(offset, limit).collect {
                 when (it) {
                     is Resource.Success -> {
-                        _pokemonResponse.emit(it.data)
+                        val newData = it.data
+
+                        val oldList =
+                            _pokemonResponse.value?.results ?: emptyList()
+                        val updatedList = oldList + (newData?.results ?: emptyList())
+
+                        _pokemonResponse.emit(newData?.copy(results = updatedList))
                     }
 
                     else -> Unit
