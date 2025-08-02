@@ -6,13 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.code.id.pokemonapp.MainActivity
 import com.code.id.pokemonapp.databinding.FragmentLoginBinding
-import com.code.id.pokemonapp.domain.model.UserEntity
 import com.code.id.pokemonapp.presentation.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -68,6 +69,14 @@ class LoginFragment : Fragment() {
     }
 
     private fun initListener() {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireActivity().finishAffinity()
+            }
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+
         binding?.apply {
             tvRegister.setOnClickListener {
                 findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())

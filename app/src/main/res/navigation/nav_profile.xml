@@ -7,7 +7,12 @@
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.code.id.pokemonapp.presentation.view.ProfileFragment"
+        android:name="com.code.id.pokemonapp.presentation.view.profile.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_nav_auth"
+            app:destination="@id/nav_auth" />
+    </fragment>
+    <include app:graph="@navigation/nav_auth" />
 </navigation>

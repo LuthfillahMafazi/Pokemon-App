@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -44,7 +44,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,7 +77,7 @@ class HomeFragment : Fragment() {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.searchResults.collect {
                     if (true) {
-                        adapter.submitList(it?.toMutableList())
+                        adapter.submitList(it.toMutableList())
                     }
                 }
             }
@@ -108,6 +108,8 @@ class HomeFragment : Fragment() {
     private fun checkUserLogin() {
         if (preferenceManager.isLoggedIn() == false) {
             findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToNavAuth())
+        } else {
+            viewModel.checkStatusLogin()
         }
     }
 
@@ -137,7 +139,10 @@ class HomeFragment : Fragment() {
                     val totalItemCount = layoutManager.itemCount
                     val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
-                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 2 && NetworkUtil.isConnected(requireContext())) {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 2 && NetworkUtil.isConnected(
+                            requireContext()
+                        )
+                    ) {
                         isLoading = true
                         offset += 10
                         viewModel.getPokemonList(offset.toString(), "10")

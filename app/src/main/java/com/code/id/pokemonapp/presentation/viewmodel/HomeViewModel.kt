@@ -1,6 +1,9 @@
 package com.code.id.pokemonapp.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.code.id.pokemonapp.data.local.PreferenceManager
 import com.code.id.pokemonapp.domain.model.PokemonItem
 import com.code.id.pokemonapp.domain.model.PokemonResponse
 import com.code.id.pokemonapp.domain.usecase.IHomeUseCase
@@ -15,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val useCase: IHomeUseCase
+    private val useCase: IHomeUseCase,
+    private val preferenceManager: PreferenceManager
 ) : ViewModel() {
 
     private val _pokemonResponse = MutableStateFlow<PokemonResponse?>(null)
@@ -24,6 +28,14 @@ class HomeViewModel @Inject constructor(
     private val _searchResults = MutableStateFlow<List<PokemonItem>>(emptyList())
     val searchResults get() = _searchResults.asStateFlow()
 
+    private val _isLogin = MutableStateFlow<Boolean>(false)
+    val isLogin get() = _isLogin.asStateFlow()
+
+    fun checkStatusLogin() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLogin.emit(preferenceManager.isLoggedIn())
+        }
+    }
 
     fun getPokemonList(offset: String, limit: String) {
         CoroutineScope(Dispatchers.IO).launch {
