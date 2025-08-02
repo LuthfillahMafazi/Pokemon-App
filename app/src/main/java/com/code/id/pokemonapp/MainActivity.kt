@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.code.id.pokemonapp.databinding.ActivityMainBinding
+import com.code.id.pokemonapp.utils.NetworkUtil
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -45,6 +46,8 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        checkConnection()
+
         val navGraphIdMap = navGraphIds.associateWith { navGraphId ->
             val fragmentTag = "bottom_nav_$navGraphId"
             val navHostFragment = supportFragmentManager.findFragmentByTag(fragmentTag)
@@ -66,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                 else -> return@setOnItemSelectedListener false
             }
 
-            navGraphIdMap.forEach { (id, navHostFragment) ->
+            navGraphIdMap.forEach { (_, navHostFragment) ->
                 supportFragmentManager.beginTransaction().hide(navHostFragment).commit()
             }
 
@@ -116,5 +119,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun checkConnection() {
+        if (!NetworkUtil.isConnected(this@MainActivity)) {
+            Toast.makeText(this@MainActivity, "No Connection Internet", Toast.LENGTH_SHORT).show()
+        }
     }
 }
