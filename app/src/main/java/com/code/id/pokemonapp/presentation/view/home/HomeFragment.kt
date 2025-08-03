@@ -71,7 +71,6 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         checkUserLogin()
-        viewModel.getPokemonList(offset.toString(), "10")
         setupAdapter()
         initSearch()
         observeSearch()
@@ -115,6 +114,7 @@ class HomeFragment : Fragment() {
             findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToNavAuth())
         } else {
             viewModel.checkStatusLogin()
+            viewModel.getPokemonList(offset.toString(), "10")
         }
     }
 
