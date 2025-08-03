@@ -1,11 +1,11 @@
 package com.code.id.pokemonapp.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.code.id.pokemonapp.domain.model.PokemonDetailResponse
 import com.code.id.pokemonapp.domain.usecase.IDetailUseCase
 import com.code.id.pokemonapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,7 @@ class DetailViewModel @Inject constructor(
     val errorResult get() = _errorResult.asSharedFlow()
 
     fun getDetailPokemon(url: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             useCase.getDetailPokemon(url).collect {
                 when (it) {
                     is Resource.Success -> {

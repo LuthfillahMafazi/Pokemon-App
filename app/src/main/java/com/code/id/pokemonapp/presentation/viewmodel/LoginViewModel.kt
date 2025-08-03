@@ -1,6 +1,7 @@
 package com.code.id.pokemonapp.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.code.id.pokemonapp.data.local.PreferenceManager
 import com.code.id.pokemonapp.domain.model.UserEntity
 import com.code.id.pokemonapp.domain.usecase.ILoginUseCase
@@ -26,7 +27,7 @@ class LoginViewModel @Inject constructor(
     val errorResult get() = _errorResult.asSharedFlow()
 
     fun loginUser(username: String, password: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             useCase.loginUser(username, password).collect {
                 when (it) {
                     is Resource.Success -> {

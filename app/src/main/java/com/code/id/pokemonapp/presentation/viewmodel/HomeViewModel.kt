@@ -1,6 +1,5 @@
 package com.code.id.pokemonapp.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.code.id.pokemonapp.data.local.PreferenceManager
@@ -9,7 +8,6 @@ import com.code.id.pokemonapp.domain.model.PokemonResponse
 import com.code.id.pokemonapp.domain.usecase.IHomeUseCase
 import com.code.id.pokemonapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,7 +36,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun getPokemonList(offset: String, limit: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             useCase.getPokemonList(offset, limit).collect {
                 when (it) {
                     is Resource.Success -> {
@@ -58,7 +56,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun searchPokemon(searchText: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val dataList = _pokemonResponse.value?.results.orEmpty()
 
             val searchList = if (searchText.isNotBlank()) {

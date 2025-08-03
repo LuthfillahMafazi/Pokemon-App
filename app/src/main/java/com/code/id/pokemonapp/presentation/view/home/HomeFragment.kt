@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -16,10 +17,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.code.id.pokemonapp.data.local.PreferenceManager
 import com.code.id.pokemonapp.databinding.FragmentHomeBinding
+import com.code.id.pokemonapp.domain.model.PokemonItem
 import com.code.id.pokemonapp.presentation.view.adapter.PokemonAdapter
 import com.code.id.pokemonapp.presentation.viewmodel.HomeViewModel
 import com.code.id.pokemonapp.utils.NetworkUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,16 +34,20 @@ class HomeFragment : Fragment() {
     private var offset = 0
     private var isLoading = false
 
+    var dataList: List<PokemonItem>? = null
+
     @Inject
     lateinit var preferenceManager: PreferenceManager
 
     private val adapter: PokemonAdapter by lazy {
         PokemonAdapter {
-            findNavController().navigate(
-                HomeFragmentDirections.actionHomeFragmentToDetailFragment(
-                    it
+            if (NetworkUtil.isConnected(requireContext())) {
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeFragmentToDetailFragment(it)
                 )
-            )
+            } else {
+                Toast.makeText(requireContext(), "Check your connection", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -75,10 +82,8 @@ class HomeFragment : Fragment() {
     private fun observeSearch() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.searchResults.collect {
-                    if (true) {
-                        adapter.submitList(it.toMutableList())
-                    }
+                viewModel.searchResults.filterNotNull().collect {
+                    adapter.submitList(it.toMutableList())
                 }
             }
         }
@@ -117,8 +122,11 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.pokemonResponse.collect {
-                    isLoading = false
-                    adapter.submitList(it?.results?.toMutableList())
+                    if (it?.results != dataList) {
+                        isLoading = false
+                        adapter.submitList(it?.results?.toMutableList())
+                        dataList = it?.results
+                    }
                 }
             }
         }
